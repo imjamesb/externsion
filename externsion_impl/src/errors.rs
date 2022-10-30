@@ -26,10 +26,10 @@ impl<'a> InstallError<'a> {}
 
 impl Display for InstallError<'_> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		let has_written_header = false;
-		let has_written = false;
-		if let Some(duplicates) = self.duplicates {
-			let has_written_duplicates = false;
+		let mut has_written_header = false;
+		let mut has_written = false;
+		if let Some(duplicates) = &self.duplicates {
+			let mut has_written_duplicates = false;
 			for (extension_name, dupes) in duplicates.iter() {
 				if dupes.len() < 2 {
 					continue;
@@ -39,7 +39,7 @@ impl Display for InstallError<'_> {
 					let write_result = write!(
 						f,
 						"{}\r\n\r\nSomething went wrong duing extension installation!\r\n\r\n{}\r\n\r\nDuplicate extensions was queued:",
-						match self.caused_by {
+						match &self.caused_by {
 							Some(error) => format!("\r\n\r\nCaused by:\r\n\r\n{}", error),
 							None => "".to_string()
 						},
@@ -75,13 +75,13 @@ impl Display for InstallError<'_> {
 			}
 			has_written = has_written_duplicates;
 		}
-		if let Some(pending_dependencies) = self.pending_dependency {
+		if let Some(pending_dependencies) = &self.pending_dependency {
 			if !has_written_header {
 				has_written_header = true;
 				let write_result = write!(
 					f,
 					"{}\r\n\r\nSomething went wrong duing extension installation!\r\n\r\n{}\r\n\r\n",
-					match self.caused_by {
+					match &self.caused_by {
 						Some(error) => format!("\r\n\r\nCaused by:\r\n\r\n{}", error),
 						None => "".to_string(),
 					},
@@ -124,12 +124,12 @@ impl Display for InstallError<'_> {
 				}
 			}
 		}
-		if let Some(version_mismatches) = self.version_mismatches {
+		if let Some(version_mismatches) = &self.version_mismatches {
 			if !has_written_header {
 				let write_result = write!(
 					f,
 					"{}\r\n\r\nSomething went wrong duing extension installation!\r\n\r\n{}\r\n\r\n",
-					match self.caused_by {
+					match &self.caused_by {
 						Some(error) => format!("\r\n\r\nCaused by:\r\n\r\n{}", error),
 						None => "".to_string(),
 					},
