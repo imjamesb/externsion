@@ -33,6 +33,15 @@ impl<'a> InstallError<'a> {
 			caused_by,
 		}
 	}
+	pub fn empty(description: String) -> InstallError<'a> {
+		InstallError {
+			duplicates: None,
+			version_mismatches: None,
+			pending_dependency: None,
+			description,
+			caused_by: None,
+		}
+	}
 
 	pub fn duplicates(&self) -> &Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>> {
 		&self.duplicates

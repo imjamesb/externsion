@@ -96,6 +96,12 @@ pub struct ExtensionManifest<T: BaseExtension + Send + Sync> {
 	pub installer: Injector<T>,
 }
 
+impl<T: BaseExtension + Send + Sync> PartialEq for ExtensionManifest<T> {
+	fn eq(&self, other: &Self) -> bool {
+		self.identifier == other.identifier
+	}
+}
+
 pub struct ExtensionContext<'a> {
 	pub shared_state: &'a mut State,
 	pub state: &'a mut State,

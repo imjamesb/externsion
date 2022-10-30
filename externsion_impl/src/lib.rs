@@ -6,7 +6,7 @@ use externsion::*;
 pub trait Repository<'a, T: BaseExtension + Send + Sync> {
 	/// Queue a manifest to be added to the repository. It will only be queued and not touched
 	/// until you you use `<Repository>.install()`
-	fn queue(&mut self, manifest: &'a ExtensionManifest<T>);
+	fn queue(&mut self, manifest: &'a ExtensionManifest<T>) -> Result<(), InstallError>;
 	/// Attempt to push a manifest manually directly onto the repository. Returns `None` if the
 	/// extension couldn't be installed immediately and is depending on another extension that hasn't
 	/// loaded yet. Returns `Some(ExtensionIdentifier)` if the extension was installed and activated
@@ -26,18 +26,26 @@ pub trait Repository<'a, T: BaseExtension + Send + Sync> {
 }
 
 impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionRepository<'a, T> {
-	fn queue(&mut self, manifest: &'a ExtensionManifest<T>) {
-		self.queued_extensions.push(manifest);
+	fn queue(&mut self, manifest: &'a ExtensionManifest<T>) -> Result<(), InstallError> {
+		if self.queued_extensions.contains(&manifest) {
+			Err(InstallError::empty("This extension is already queued".to_string()))
+		} else {
+			self.queued_extensions.push(manifest);
+			Ok(())
+		}
 	}
+
 	fn push(
 		&mut self,
 		manifest: &'a ExtensionManifest<T>,
 	) -> Result<Option<&'a ExtensionIdentifier>, InstallError> {
 		todo!();
 	}
+
 	fn flush(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError> {
 		todo!();
 	}
+
 	fn install(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError> {
 		todo!();
 	}
