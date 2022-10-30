@@ -9,4 +9,11 @@ pub trait Repository<'a, T: BaseExtension + Send + Sync> {
 	fn install(&mut self) -> Result<(), ()>;
 }
 
-impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionRepository<'a, T> {}
+impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionRepository<'a, T> {
+	fn queue(&mut self, manifest: &'a ExtensionManifest<T>) {
+		self.queued_extensions.push(manifest);
+	}
+	fn install(&mut self) -> Result<(), ()> {
+		todo!();
+	}
+}
