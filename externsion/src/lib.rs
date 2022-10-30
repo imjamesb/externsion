@@ -1,0 +1,156 @@
+mod errors;
+
+use std::{collections::HashMap, fmt::Display, sync::Arc};
+
+pub use errors::InjectionError;
+pub use gotham_state::State;
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub struct ExtensionIdentifier {
+	pub name: &'static str,
+	pub version: &'static str,
+}
+
+impl ExtensionIdentifier {
+	pub fn new(name: &'static str, version: &'static str) -> Self {
+		ExtensionIdentifier { name, version }
+	}
+}
+
+impl Clone for ExtensionIdentifier {
+	fn clone(&self) -> Self {
+		ExtensionIdentifier {
+			name: self.name,
+			version: self.version,
+		}
+	}
+}
+
+impl Display for ExtensionIdentifier {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "'{}@{}'", self.name, self.version)
+	}
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub struct ExtensionDependency {
+	pub name: &'static str,
+	pub expected_version: &'static str,
+}
+
+impl Clone for ExtensionDependency {
+	fn clone(&self) -> Self {
+		ExtensionDependency {
+			name: self.name,
+			expected_version: self.expected_version,
+		}
+	}
+}
+
+pub trait BaseExtension {
+	// Fired immediately when the extension has been injected.
+	fn loaded(&self, _ctx: &mut ExtensionContext) {}
+	// Fired when all required extensions has been injected..
+	fn ready(&self, _ctx: &mut ExtensionContext) {}
+	/// Fetches a reference to the identifier of *this* extension.
+	fn identifier<'a>(&self, ctx: &mut ExtensionContext<'a>) -> IdentifierContainer {
+		let identifier = ctx.internal_state.borrow::<Arc<ExtensionIdentifier>>();
+		IdentifierContainer {
+			identifier: Arc::clone(&identifier),
+		}
+	}
+}
+
+pub type BoxedExtension<T> = Box<T>;
+pub type InstalledExtension<T> = Arc<BoxedExtension<T>>;
+
+pub struct ExtensionInjector<'a, T: BaseExtension + Send + Sync> {
+	identifier: &'a ExtensionIdentifier,
+	extension: Option<BoxedExtension<T>>,
+}
+
+impl<'a, T: BaseExtension + Send + Sync> ExtensionInjector<'a, T> {
+	pub fn inject(self: &mut ExtensionInjector<'a, T>, extension: T) -> Result<(), InjectionError<'a>> {
+		if self.extension.is_none() {
+			self.extension = Some(Box::new(extension));
+			Ok(())
+		} else {
+			Err(InjectionError::new(
+				&self.identifier,
+				"This library has already injected an extension!".to_string(),
+			))
+		}
+	}
+}
+
+pub enum Injector<T: BaseExtension + Send + Sync> {
+	Dynamic(unsafe extern "C" fn(&mut ExtensionInjector<T>)),
+	Library(fn(&mut ExtensionInjector<T>)),
+	Internal(BoxedExtension<T>),
+}
+
+pub struct ExtensionManifest<T: BaseExtension + Send + Sync> {
+	pub identifier: ExtensionIdentifier,
+	pub dependencies: Option<&'static [ExtensionDependency]>,
+	pub optional_dependencies: Option<&'static [ExtensionDependency]>,
+	pub installer: Injector<T>,
+}
+
+pub struct ExtensionContext<'a> {
+	pub shared_state: &'a mut State,
+	pub state: &'a mut State,
+	internal_state: &'a mut State,
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub struct IdentifierContainer {
+	identifier: Arc<ExtensionIdentifier>,
+}
+
+impl IdentifierContainer {
+	pub fn name(&self) -> &'static str {
+		self.identifier.name
+	}
+
+	pub fn version(&self) -> &'static str {
+		self.identifier.name
+	}
+}
+
+impl Display for IdentifierContainer {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "'{}@{}'", self.name(), self.version())
+	}
+}
+
+pub type InstalledVersion = &'static str;
+pub type DependencyName = &'static str;
+pub type ExtensionName = &'static str;
+pub type ExpectedVersion = &'static str;
+pub type RequiredDependency = bool;
+pub type DependencyIdentifier = ExtensionIdentifier;
+
+pub struct ExtensionRepository<'a, T: BaseExtension + Send + Sync> {
+	pub installed_extensions: Vec<T>,
+	pub visited_extensions: HashMap<&'static str, &'a ExtensionIdentifier>,
+	pub queued_extensions: Vec<&'a ExtensionManifest<T>>,
+	pub duplicates: HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>,
+	pub version_mismatches: HashMap<&'a ExtensionIdentifier, (&'a ExtensionDependency, InstalledVersion)>,
+	pub pending_dependency:
+		HashMap<DependencyName, Vec<(&'a ExtensionManifest<T>, ExpectedVersion, RequiredDependency)>>,
+	pub pending: HashMap<&'a ExtensionIdentifier, u32>,
+}
+
+impl<T: BaseExtension + Send + Sync> ExtensionRepository<'_, T> {
+	pub fn new() -> Self {
+		ExtensionRepository {
+			installed_extensions: Vec::new(),
+			visited_extensions: HashMap::new(),
+			queued_extensions: Vec::new(),
+			duplicates: HashMap::new(),
+			version_mismatches: HashMap::new(),
+			pending_dependency: HashMap::new(),
+			pending: HashMap::new(),
+		}
+	}
+}
