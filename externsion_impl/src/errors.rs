@@ -2,14 +2,6 @@ use std::{collections::HashMap, error::Error, fmt::Display};
 
 use externsion::*;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub enum InstallErrorReason {
-	Duplicates = 1,
-	VersionMismatches = 2,
-	MissingDependencies = 4,
-	Unknown = 8,
-}
-
 #[derive(Debug)]
 pub struct InstallError<'a> {
 	duplicates: Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>>,
@@ -17,12 +9,47 @@ pub struct InstallError<'a> {
 		Option<HashMap<&'a DependencyIdentifier, Vec<(ExpectedVersion, ExtensionIdentifier)>>>,
 	pending_dependency:
 		Option<HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>>,
-	reason: InstallErrorReason,
 	description: String,
 	caused_by: Option<Box<dyn Error>>,
 }
 
-impl<'a> InstallError<'a> {}
+impl<'a> InstallError<'a> {
+	pub fn new(
+		duplicates: Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>>,
+		version_mismatches: Option<
+			HashMap<&'a DependencyIdentifier, Vec<(ExpectedVersion, ExtensionIdentifier)>>,
+		>,
+		pending_dependency: Option<
+			HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>,
+		>,
+		description: String,
+		caused_by: Option<Box<dyn Error>>,
+	) -> InstallError<'a> {
+		InstallError {
+			duplicates,
+			version_mismatches,
+			pending_dependency,
+			description,
+			caused_by,
+		}
+	}
+
+	pub fn duplicates(&self) -> &Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>> {
+		&self.duplicates
+	}
+
+	pub fn version_mismatches(
+		&self,
+	) -> &Option<HashMap<&'a DependencyIdentifier, Vec<(ExpectedVersion, ExtensionIdentifier)>>> {
+		&self.version_mismatches
+	}
+
+	pub fn pending_dependency(
+		&self,
+	) -> &Option<HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>> {
+		&self.pending_dependency
+	}
+}
 
 impl Display for InstallError<'_> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
