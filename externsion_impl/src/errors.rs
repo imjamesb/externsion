@@ -11,7 +11,7 @@ pub enum InstallErrorReason {
 }
 
 #[derive(Debug)]
-pub struct InstallError<'a, T: BaseExtension + Send + Sync> {
+pub struct InstallError<'a> {
 	duplicates: Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>>,
 	version_mismatches:
 		Option<HashMap<&'a DependencyIdentifier, Vec<(ExpectedVersion, ExtensionIdentifier)>>>,
@@ -22,9 +22,9 @@ pub struct InstallError<'a, T: BaseExtension + Send + Sync> {
 	caused_by: Option<Box<dyn Error>>,
 }
 
-impl<'a, T: BaseExtension + Send + Sync> InstallError<'a, T> {}
+impl<'a> InstallError<'a> {}
 
-impl<T: BaseExtension + Send + Sync> Display for InstallError<'_, T> {
+impl Display for InstallError<'_> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		let has_written_header = false;
 		let has_written = false;
@@ -116,7 +116,8 @@ impl<T: BaseExtension + Send + Sync> Display for InstallError<'_, T> {
 					}
 				}
 				for (identifier, dependency) in dependents.iter() {
-					let write_result = write!(f, "\r\n    {} requires {}", identifier, dependency);
+					let write_result =
+						write!(f, "\r\n    {} requires {}", identifier, dependency.expected_version);
 					if write_result.is_err() {
 						return write_result;
 					}
@@ -179,7 +180,7 @@ impl<T: BaseExtension + Send + Sync> Display for InstallError<'_, T> {
 	}
 }
 
-impl<T: BaseExtension + Send + Sync> Error for InstallError<'_, T> {
+impl Error for InstallError<'_> {
 	fn description(&self) -> &str {
 		self.description.as_str()
 	}
