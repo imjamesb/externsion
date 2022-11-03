@@ -1,6 +1,5 @@
-use std::{collections::HashMap, error::Error, fmt::Display};
-
 use externsion::*;
+use std::{collections::HashMap, error::Error, fmt::Display};
 
 #[derive(Debug)]
 pub struct InstallError<'a> {
@@ -11,6 +10,7 @@ pub struct InstallError<'a> {
 		Option<HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>>,
 	description: String,
 	caused_by: Option<Box<dyn Error>>,
+	sources: HashMap<&'a ExtensionIdentifier, &'a str>,
 }
 
 impl<'a> InstallError<'a> {
@@ -24,6 +24,7 @@ impl<'a> InstallError<'a> {
 		>,
 		description: String,
 		caused_by: Option<Box<dyn Error>>,
+		sources: Option<HashMap<&'a ExtensionIdentifier, &'a str>>,
 	) -> InstallError<'a> {
 		InstallError {
 			duplicates,
@@ -31,6 +32,13 @@ impl<'a> InstallError<'a> {
 			pending_dependency,
 			description,
 			caused_by,
+			sources: {
+				if let Some(sources) = sources {
+					sources
+				} else {
+					HashMap::new()
+				}
+			},
 		}
 	}
 	pub fn empty(description: String) -> InstallError<'a> {
@@ -40,6 +48,7 @@ impl<'a> InstallError<'a> {
 			pending_dependency: None,
 			description,
 			caused_by: None,
+			sources: HashMap::new(),
 		}
 	}
 
@@ -96,12 +105,18 @@ impl Display for InstallError<'_> {
 				for duplicate in dupes.iter() {
 					let write_result = write!(
 						f,
-						"{}{}",
+						"{}{}{}",
 						match has_written {
 							true => ", ",
 							false => "",
 						},
-						duplicate
+						duplicate,
+						match self.sources.contains_key(duplicate) {
+							true => {
+								format!(" ({})", self.sources.get(duplicate).unwrap())
+							},
+							false => String::from(""),
+						}
 					);
 					has_written = true;
 					if write_result.is_err() {

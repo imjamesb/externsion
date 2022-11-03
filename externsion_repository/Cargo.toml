@@ -1,5 +1,5 @@
 [package]
-name = "externsion_impl"
+name = "externsion_repository"
 version = "0.1.0"
 edition = "2021"
 

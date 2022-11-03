@@ -144,6 +144,7 @@ pub struct ExtensionRepository<'a, T: BaseExtension + Send + Sync> {
 	pub version_mismatches: HashMap<&'a DependencyIdentifier, Vec<(ExpectedVersion, ExtensionIdentifier)>>,
 	pub pending_dependency: HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>,
 	pub pending_counter: HashMap<&'a ExtensionIdentifier, u32>,
+	pub extension_sources: HashMap<&'a ExtensionIdentifier, Option<&'a str>>,
 }
 
 impl<T: BaseExtension + Send + Sync> ExtensionRepository<'_, T> {
@@ -156,6 +157,7 @@ impl<T: BaseExtension + Send + Sync> ExtensionRepository<'_, T> {
 			version_mismatches: HashMap::new(),
 			pending_dependency: HashMap::new(),
 			pending_counter: HashMap::new(),
+			extension_sources: HashMap::new(),
 		}
 	}
 }
