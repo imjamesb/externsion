@@ -1,5 +1,9 @@
-use externsion::*;
 use std::{collections::HashMap, error::Error, fmt::Display};
+
+use crate::{
+	DependencyIdentifier, DependencyName, ExpectedVersion, ExtensionDependency, ExtensionIdentifier,
+	ExtensionName,
+};
 
 #[derive(Debug)]
 pub struct InstallError<'a> {

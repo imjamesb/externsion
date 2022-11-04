@@ -1,4 +1,4 @@
-use externsion::*;
+use crate::ExtensionIdentifier;
 use std::{error::Error, fmt::Display};
 
 #[derive(Debug)]
