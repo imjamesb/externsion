@@ -5,7 +5,7 @@ use crate::{
 	ExtensionIdentifier, ExtensionManifest, ExtensionName,
 };
 
-pub struct ExtensionRepository<'a, T: BaseExtension + Send + Sync> {
+pub struct InnerRepository<'a, T: BaseExtension + Send + Sync> {
 	pub installed_extensions: Vec<&'a T>,
 	pub loaded_extensions: HashMap<&'static str, (&'a ExtensionIdentifier, &'a T)>,
 	pub queued_extensions: Vec<&'a ExtensionManifest<T>>,
@@ -16,9 +16,9 @@ pub struct ExtensionRepository<'a, T: BaseExtension + Send + Sync> {
 	pub extension_sources: HashMap<&'a ExtensionIdentifier, Option<&'a str>>,
 }
 
-impl<T: BaseExtension + Send + Sync> ExtensionRepository<'_, T> {
+impl<T: BaseExtension + Send + Sync> InnerRepository<'_, T> {
 	pub fn new() -> Self {
-		ExtensionRepository {
+		InnerRepository {
 			installed_extensions: Vec::new(),
 			loaded_extensions: HashMap::new(),
 			queued_extensions: Vec::new(),

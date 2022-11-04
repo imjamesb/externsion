@@ -5,8 +5,8 @@ mod extension_dependency;
 mod extension_identifier;
 mod extension_injector;
 mod extension_manifest;
-mod extension_repository;
 mod extension_types;
+mod inner_repository;
 mod repository_proxy;
 
 pub use base_extension::*;
@@ -16,7 +16,7 @@ pub use extension_dependency::*;
 pub use extension_identifier::*;
 pub use extension_injector::*;
 pub use extension_manifest::*;
-pub use extension_repository::*;
 pub use extension_types::*;
 pub use gotham_state::*;
+pub use inner_repository::*;
 pub use repository_proxy::*;

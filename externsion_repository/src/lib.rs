@@ -57,7 +57,7 @@ pub trait Repository<'a, T: BaseExtension + Send + Sync> {
 	fn get_source(&self, extension: &'a ExtensionIdentifier) -> Option<&'a str>;
 }
 
-impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionRepository<'a, T> {
+impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for InnerRepository<'a, T> {
 	fn queue(
 		&mut self,
 		manifest: &'a ExtensionManifest<T>,
