@@ -1,13 +1,13 @@
-use crate::{BaseExtension, ExtensionDependency, ExtensionIdentifier, Injector};
+use crate::{ExtensionDependency, ExtensionIdentifier, Injector};
 
-pub struct ExtensionManifest<T: BaseExtension + Send + Sync> {
+pub struct ExtensionManifest {
 	pub identifier: ExtensionIdentifier,
 	pub dependencies: Option<&'static [ExtensionDependency]>,
 	pub optional_dependencies: Option<&'static [ExtensionDependency]>,
-	pub installer: Injector<T>,
+	pub installer: Injector<'static>,
 }
 
-impl<T: BaseExtension + Send + Sync> PartialEq for ExtensionManifest<T> {
+impl PartialEq for ExtensionManifest {
 	fn eq(&self, other: &Self) -> bool {
 		self.identifier == other.identifier
 	}

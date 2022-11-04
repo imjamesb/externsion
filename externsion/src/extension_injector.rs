@@ -1,14 +1,17 @@
-use crate::{BaseExtension, BoxedExtension, ExtensionIdentifier, InjectionError};
+use crate::{BoxedExtension, ExtensionIdentifier, InjectionError};
 
-pub struct ExtensionInjector<'a, T: BaseExtension + Send + Sync> {
+pub struct ExtensionInjector<'a> {
 	identifier: &'a ExtensionIdentifier,
-	extension: Option<BoxedExtension<T>>,
+	extension: Option<BoxedExtension<'a>>,
 }
 
-impl<'a, T: BaseExtension + Send + Sync> ExtensionInjector<'a, T> {
-	pub fn inject(self: &mut ExtensionInjector<'a, T>, extension: T) -> Result<(), InjectionError<'a>> {
+impl<'a> ExtensionInjector<'a> {
+	pub fn inject(
+		self: &mut ExtensionInjector<'a>,
+		extension: BoxedExtension<'a>,
+	) -> Result<(), InjectionError<'a>> {
 		if self.extension.is_none() {
-			self.extension = Some(Box::new(extension));
+			self.extension = Some(extension);
 			Ok(())
 		} else {
 			Err(InjectionError::new(
@@ -19,8 +22,8 @@ impl<'a, T: BaseExtension + Send + Sync> ExtensionInjector<'a, T> {
 	}
 }
 
-pub enum Injector<T: BaseExtension + Send + Sync> {
-	Dynamic(unsafe extern "C" fn(&mut ExtensionInjector<T>)),
-	Library(fn(&mut ExtensionInjector<T>)),
-	Internal(BoxedExtension<T>),
+pub enum Injector<'a> {
+	Dynamic(unsafe extern "C" fn(&mut ExtensionInjector)),
+	Library(fn(&mut ExtensionInjector)),
+	Internal(BoxedExtension<'a>),
 }

@@ -8,6 +8,7 @@ mod extension_manifest;
 mod extension_types;
 mod inner_repository;
 mod repository;
+mod repository_operation;
 mod repository_proxy;
 
 pub use base_extension::*;
@@ -21,4 +22,5 @@ pub use extension_types::*;
 pub use gotham_state::*;
 pub use inner_repository::*;
 pub use repository::*;
+pub use repository_operation::*;
 pub use repository_proxy::*;
