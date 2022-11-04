@@ -1,4 +1,6 @@
-use crate::{ExtensionIdentifier, ExtensionManifest, InstallError, RepositoryOperation, SetSourceError};
+use crate::{
+	ExtensionIdentifier, ExtensionManifest, InstallError, QueueError, RepositoryOperation, SetSourceError,
+};
 use std::error::Error;
 
 /// Methods that allow manipulating the inner extension
@@ -6,11 +8,7 @@ use std::error::Error;
 pub trait Repository<'a> {
 	/// Queue an extension to be loaded. Returns an error if
 	/// a manifest with the same identifier has been queued.
-	fn queue(
-		&mut self,
-		manifest: &'a ExtensionManifest,
-		source: Option<&'a str>,
-	) -> Result<(), Box<dyn Error + 'a>>;
+	fn queue(&mut self, manifest: &'a ExtensionManifest, source: Option<&'a str>) -> Result<(), QueueError>;
 
 	/// Attempt to install an extension directly onto the
 	/// repository and skip the queue. Returns an error if
@@ -46,10 +44,7 @@ pub trait Repository<'a> {
 	/// return ownership of the manifest. Returns an error
 	/// if for some reason the manifest can not be removed
 	/// from the queue.
-	fn unqueue(
-		&mut self,
-		identifier: &'a ExtensionIdentifier,
-	) -> Result<ExtensionManifest, Box<dyn Error + 'a>>;
+	fn unqueue(&mut self, identifier: &'a ExtensionIdentifier) -> Result<ExtensionManifest, QueueError>;
 
 	/// Attempt to set the source for an extension. The
 	/// extension to set the source for must exist within the

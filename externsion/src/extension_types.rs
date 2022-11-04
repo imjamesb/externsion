@@ -9,3 +9,4 @@ pub type RequiredDependency = bool;
 pub type DependencyIdentifier = ExtensionIdentifier;
 pub type BoxedExtension<'a> = Box<dyn BaseExtension + Send + Sync + 'a>;
 pub type InstalledExtension<'a> = Arc<BoxedExtension<'a>>;
+pub type ExtensionSource<'a> = &'a str;
