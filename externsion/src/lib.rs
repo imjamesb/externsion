@@ -10,13 +10,13 @@ mod extension_types;
 mod repository_proxy;
 
 pub use base_extension::*;
-pub use errors::InjectionError;
+pub use errors::*;
 pub use extension_context::*;
-pub use extension_dependency::ExtensionDependency;
-pub use extension_identifier::ExtensionIdentifier;
+pub use extension_dependency::*;
+pub use extension_identifier::*;
 pub use extension_injector::*;
 pub use extension_manifest::*;
 pub use extension_repository::*;
 pub use extension_types::*;
-pub use gotham_state::State;
+pub use gotham_state::*;
 pub use repository_proxy::*;
