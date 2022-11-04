@@ -20,7 +20,7 @@ impl Repository<'_> {
 impl<'a> ExtRepository<'a> for Repository<'a> {
 	fn queue(
 		&mut self,
-		manifest: &'a externsion::ExtensionManifest,
+		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
 	) -> Result<(), QueueError<'a>> {
 		todo!();
@@ -35,7 +35,7 @@ impl<'a> ExtRepository<'a> for Repository<'a> {
 
 	fn push(
 		&mut self,
-		manifest: &'a externsion::ExtensionManifest,
+		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
 	) -> Result<&'a ExtensionIdentifier, InstallError<'a>> {
 		todo!();
