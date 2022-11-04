@@ -113,6 +113,7 @@ impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionReposito
 	fn install(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError<'a>> {
 		todo!();
 	}
+
 	fn set_source(
 		&mut self,
 		extension: &'a ExtensionIdentifier,
@@ -160,6 +161,7 @@ impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionReposito
 			},
 		}
 	}
+
 	fn stage(&mut self, extension: &'a ExtensionIdentifier) -> ExtensionStage {
 		let is_some = {
 			self.queued_extensions
@@ -183,6 +185,7 @@ impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionReposito
 			ExtensionStage::Unknown
 		}
 	}
+
 	fn unqueue(&mut self, extension: &'a ExtensionIdentifier) -> bool {
 		if let Some(index) = self
 			.queued_extensions
@@ -195,6 +198,7 @@ impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionReposito
 			false
 		}
 	}
+
 	fn get_source(&self, extension: &'a ExtensionIdentifier) -> Option<&'a str> {
 		if let Some(source) = self.extension_sources.get(extension) {
 			if let Some(source) = source {
