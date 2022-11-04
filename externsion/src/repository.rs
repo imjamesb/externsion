@@ -79,5 +79,5 @@ pub trait Repository<'a> {
 	fn unload(
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
-	) -> Result<ExtensionManifest, Box<UnloadError<'a>>>;
+	) -> Result<ExtensionManifest, UnloadError<'a>>;
 }
