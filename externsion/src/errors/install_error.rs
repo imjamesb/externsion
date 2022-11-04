@@ -8,16 +8,16 @@ use crate::{
 #[derive(Debug)]
 pub struct InstallError<'a> {
 	duplicates:
-		Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>>,
+		Option<HashMap<ExtensionName<'a>, Vec<&'a ExtensionIdentifier>>>,
 	version_mismatches: Option<
 		HashMap<
 			&'a DependencyIdentifier,
-			Vec<(ExpectedVersion, ExtensionIdentifier)>,
+			Vec<(ExpectedVersion<'a>, ExtensionIdentifier)>,
 		>,
 	>,
 	pending_dependency: Option<
 		HashMap<
-			DependencyName,
+			DependencyName<'a,
 			Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>,
 		>,
 	>,
