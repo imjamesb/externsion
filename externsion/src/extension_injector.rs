@@ -16,7 +16,8 @@ impl<'a> ExtensionInjector<'a> {
 		} else {
 			Err(InjectionError::new(
 				&self.identifier,
-				"This library has already injected an extension!".to_string(),
+				"This library has already injected an extension!"
+					.to_string(),
 			))
 		}
 	}

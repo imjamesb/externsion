@@ -10,7 +10,10 @@ pub struct InjectionError<'a> {
 }
 
 impl InjectionError<'_> {
-	pub fn new<'a>(extension_identifier: &'a ExtensionIdentifier, description: String) -> InjectionError<'a> {
+	pub fn new<'a>(
+		extension_identifier: &'a ExtensionIdentifier,
+		description: String,
+	) -> InjectionError<'a> {
 		InjectionError {
 			extension_identifier,
 			description,
@@ -36,7 +39,11 @@ impl InjectionError<'_> {
 
 impl Display for InjectionError<'_> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "Couldn't inject extension {}: {}", self.extension_identifier, self.description)
+		write!(
+			f,
+			"Couldn't inject extension {}: {}",
+			self.extension_identifier, self.description
+		)
 	}
 }
 

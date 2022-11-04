@@ -1,19 +1,28 @@
 use std::collections::HashMap;
 
 use crate::{
-	BaseExtension, DependencyIdentifier, DependencyName, ExpectedVersion, ExtensionDependency,
-	ExtensionIdentifier, ExtensionManifest, ExtensionName,
+	BaseExtension, DependencyIdentifier, DependencyName, ExpectedVersion,
+	ExtensionDependency, ExtensionIdentifier, ExtensionManifest,
+	ExtensionName,
 };
 
 pub struct InnerRepository<'a, T: BaseExtension + Send + Sync> {
 	pub installed_extensions: Vec<&'a T>,
-	pub loaded_extensions: HashMap<&'static str, (&'a ExtensionIdentifier, &'a T)>,
+	pub loaded_extensions:
+		HashMap<&'static str, (&'a ExtensionIdentifier, &'a T)>,
 	pub queued_extensions: Vec<&'a ExtensionManifest>,
 	pub duplicates: HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>,
-	pub version_mismatches: HashMap<&'a DependencyIdentifier, Vec<(ExpectedVersion, ExtensionIdentifier)>>,
-	pub pending_dependency: HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>,
+	pub version_mismatches: HashMap<
+		&'a DependencyIdentifier,
+		Vec<(ExpectedVersion, ExtensionIdentifier)>,
+	>,
+	pub pending_dependency: HashMap<
+		DependencyName,
+		Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>,
+	>,
 	pub pending_counter: HashMap<&'a ExtensionIdentifier, u32>,
-	pub extension_sources: HashMap<&'a ExtensionIdentifier, Option<&'a str>>,
+	pub extension_sources:
+		HashMap<&'a ExtensionIdentifier, Option<&'a str>>,
 }
 
 impl<T: BaseExtension + Send + Sync> InnerRepository<'_, T> {

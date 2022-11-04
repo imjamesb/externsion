@@ -43,10 +43,17 @@ impl Display for SetSourceError<'_> {
 			write!(
 				f,
 				"Could not replace source ({:?}) with {:?} for {}: {}",
-				previous_value, self.new_value, self.identifier, self.reason
+				previous_value,
+				self.new_value,
+				self.identifier,
+				self.reason
 			)
 		} else {
-			write!(f, "Could not set source {:?} for {}: {}", self.new_value, self.identifier, self.reason)
+			write!(
+				f,
+				"Could not set source {:?} for {}: {}",
+				self.new_value, self.identifier, self.reason
+			)
 		}
 	}
 }

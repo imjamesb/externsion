@@ -17,7 +17,8 @@ impl<'a> RepositoryProxy<'a> {
 	/// directly depend on the requested extension. Returns
 	/// `None` if the extension is not installed on the
 	/// repository or `Some(extension)` otherwise.
-	pub fn get_dependency<T: BaseExtension + Send + Sync>() -> Result<Option<&'a T>, Box<dyn Error + 'a>> {
+	pub fn get_dependency<T: BaseExtension + Send + Sync>(
+	) -> Result<Option<&'a T>, Box<dyn Error + 'a>> {
 		todo!();
 	}
 }

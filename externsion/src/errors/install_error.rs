@@ -1,17 +1,26 @@
 use std::{collections::HashMap, error::Error, fmt::Display};
 
 use crate::{
-	DependencyIdentifier, DependencyName, ExpectedVersion, ExtensionDependency, ExtensionIdentifier,
-	ExtensionName,
+	DependencyIdentifier, DependencyName, ExpectedVersion,
+	ExtensionDependency, ExtensionIdentifier, ExtensionName,
 };
 
 #[derive(Debug)]
 pub struct InstallError<'a> {
-	duplicates: Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>>,
-	version_mismatches:
-		Option<HashMap<&'a DependencyIdentifier, Vec<(ExpectedVersion, ExtensionIdentifier)>>>,
-	pending_dependency:
-		Option<HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>>,
+	duplicates:
+		Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>>,
+	version_mismatches: Option<
+		HashMap<
+			&'a DependencyIdentifier,
+			Vec<(ExpectedVersion, ExtensionIdentifier)>,
+		>,
+	>,
+	pending_dependency: Option<
+		HashMap<
+			DependencyName,
+			Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>,
+		>,
+	>,
 	description: String,
 	caused_by: Option<Box<dyn Error + 'a>>,
 	sources: HashMap<&'a ExtensionIdentifier, &'a str>,
@@ -19,12 +28,20 @@ pub struct InstallError<'a> {
 
 impl<'a> InstallError<'a> {
 	pub fn new(
-		duplicates: Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>>,
+		duplicates: Option<
+			HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>,
+		>,
 		version_mismatches: Option<
-			HashMap<&'a DependencyIdentifier, Vec<(ExpectedVersion, ExtensionIdentifier)>>,
+			HashMap<
+				&'a DependencyIdentifier,
+				Vec<(ExpectedVersion, ExtensionIdentifier)>,
+			>,
 		>,
 		pending_dependency: Option<
-			HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>,
+			HashMap<
+				DependencyName,
+				Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>,
+			>,
 		>,
 		description: String,
 		caused_by: Option<Box<dyn Error + 'a>>,
@@ -55,7 +72,10 @@ impl<'a> InstallError<'a> {
 			sources: HashMap::new(),
 		}
 	}
-	pub fn caused_by(description: String, error: Box<dyn Error + 'a>) -> InstallError<'a> {
+	pub fn caused_by(
+		description: String,
+		error: Box<dyn Error + 'a>,
+	) -> InstallError<'a> {
 		InstallError {
 			duplicates: None,
 			version_mismatches: None,
@@ -66,19 +86,31 @@ impl<'a> InstallError<'a> {
 		}
 	}
 
-	pub fn duplicates(&self) -> &Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>> {
+	pub fn duplicates(
+		&self,
+	) -> &Option<HashMap<ExtensionName, Vec<&'a ExtensionIdentifier>>> {
 		&self.duplicates
 	}
 
 	pub fn version_mismatches(
 		&self,
-	) -> &Option<HashMap<&'a DependencyIdentifier, Vec<(ExpectedVersion, ExtensionIdentifier)>>> {
+	) -> &Option<
+		HashMap<
+			&'a DependencyIdentifier,
+			Vec<(ExpectedVersion, ExtensionIdentifier)>,
+		>,
+	> {
 		&self.version_mismatches
 	}
 
 	pub fn pending_dependency(
 		&self,
-	) -> &Option<HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>> {
+	) -> &Option<
+		HashMap<
+			DependencyName,
+			Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>,
+		>,
+	> {
 		&self.pending_dependency
 	}
 }
@@ -111,7 +143,8 @@ impl Display for InstallError<'_> {
 				has_written_duplicates = true;
 				has_written = false;
 				{
-					let write_result = write!(f, "\r\n  {} has ", extension_name);
+					let write_result =
+						write!(f, "\r\n  {} has ", extension_name);
 					if write_result.is_err() {
 						return write_result;
 					}
@@ -127,7 +160,10 @@ impl Display for InstallError<'_> {
 						duplicate,
 						match self.sources.contains_key(duplicate) {
 							true => {
-								format!(" ({})", self.sources.get(duplicate).unwrap())
+								format!(
+									" ({})",
+									self.sources.get(duplicate).unwrap()
+								)
 							},
 							false => String::from(""),
 						}
@@ -170,19 +206,25 @@ impl Display for InstallError<'_> {
 					return write_result;
 				}
 			}
-			for (dependency_name, dependents) in pending_dependencies.iter() {
+			for (dependency_name, dependents) in
+				pending_dependencies.iter()
+			{
 				if dependents.len() < 1 {
 					continue;
 				}
 				{
-					let write_result = write!(f, "\r\n  {}:", dependency_name);
+					let write_result =
+						write!(f, "\r\n  {}:", dependency_name);
 					if write_result.is_err() {
 						return write_result;
 					}
 				}
 				for (identifier, dependency) in dependents.iter() {
-					let write_result =
-						write!(f, "\r\n    {} requires {}", identifier, dependency.expected_version);
+					let write_result = write!(
+						f,
+						"\r\n    {} requires {}",
+						identifier, dependency.expected_version
+					);
 					if write_result.is_err() {
 						return write_result;
 					}
@@ -221,14 +263,21 @@ impl Display for InstallError<'_> {
 			}
 			for (dependency, dependents) in version_mismatches.iter() {
 				{
-					let write_result =
-						write!(f, "\r\n  {} (installed: {}", dependency.name, dependency.version);
+					let write_result = write!(
+						f,
+						"\r\n  {} (installed: {}",
+						dependency.name, dependency.version
+					);
 					if write_result.is_err() {
 						return write_result;
 					}
 				}
 				for (expected_version, dependent) in dependents.iter() {
-					let write_result = write!(f, "\r\n    {} requires: {}", dependent, expected_version);
+					let write_result = write!(
+						f,
+						"\r\n    {} requires: {}",
+						dependent, expected_version
+					);
 					if write_result.is_err() {
 						return write_result;
 					}

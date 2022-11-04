@@ -1,5 +1,6 @@
 use crate::{
-	ExtensionIdentifier, ExtensionManifest, InstallError, QueueError, RepositoryOperation, SetSourceError,
+	ExtensionIdentifier, ExtensionManifest, InstallError, QueueError,
+	RepositoryOperation, SetSourceError,
 };
 use std::error::Error;
 
@@ -8,7 +9,11 @@ use std::error::Error;
 pub trait Repository<'a> {
 	/// Queue an extension to be loaded. Returns an error if
 	/// a manifest with the same identifier has been queued.
-	fn queue(&mut self, manifest: &'a ExtensionManifest, source: Option<&'a str>) -> Result<(), QueueError>;
+	fn queue(
+		&mut self,
+		manifest: &'a ExtensionManifest,
+		source: Option<&'a str>,
+	) -> Result<(), QueueError>;
 
 	/// Attempt to install an extension directly onto the
 	/// repository and skip the queue. Returns an error if
@@ -44,7 +49,10 @@ pub trait Repository<'a> {
 	/// return ownership of the manifest. Returns an error
 	/// if for some reason the manifest can not be removed
 	/// from the queue.
-	fn unqueue(&mut self, identifier: &'a ExtensionIdentifier) -> Result<ExtensionManifest, QueueError>;
+	fn unqueue(
+		&mut self,
+		identifier: &'a ExtensionIdentifier,
+	) -> Result<ExtensionManifest, QueueError>;
 
 	/// Attempt to set the source for an extension. The
 	/// extension to set the source for must exist within the
@@ -59,8 +67,10 @@ pub trait Repository<'a> {
 	/// error if the extension does not exist within the
 	/// repository. Or an option that might contain a str if
 	/// a source has been set for the requested identifier.
-	fn get_source(&self, identifier: &'a ExtensionIdentifier)
-		-> Result<Option<&'a str>, Box<dyn Error + 'a>>;
+	fn get_source(
+		&self,
+		identifier: &'a ExtensionIdentifier,
+	) -> Result<Option<&'a str>, Box<dyn Error + 'a>>;
 
 	/// Attempt to unload an extension from the repository.
 	/// Returns an error if the extension could not be
