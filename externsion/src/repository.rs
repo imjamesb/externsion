@@ -1,9 +1,8 @@
 use crate::{
 	ExtensionIdentifier, ExtensionManifest, ExtensionSource,
 	GetSourceError, InstallError, QueueError, RepositoryOperation,
-	SetSourceError,
+	SetSourceError, UnloadError,
 };
-use std::error::Error;
 
 /// Methods that allow manipulating the inner extension
 /// repository.
@@ -80,8 +79,5 @@ pub trait Repository<'a> {
 	fn unload(
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
-	) -> Result<ExtensionManifest, Box<dyn Error + 'a>>;
+	) -> Result<ExtensionManifest, Box<UnloadError<'a>>>;
 }
-
-// todo(imjamesb): Create an error type for unload and
-// replace the error type for `Repository.unload`.
