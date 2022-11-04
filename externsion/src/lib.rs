@@ -1,36 +1,11 @@
 mod errors;
+mod extension_identifier;
 
 use std::{collections::HashMap, error::Error, fmt::Display, sync::Arc};
 
 pub use errors::InjectionError;
+pub use extension_identifier::ExtensionIdentifier;
 pub use gotham_state::State;
-
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub struct ExtensionIdentifier {
-	pub name: &'static str,
-	pub version: &'static str,
-}
-
-impl ExtensionIdentifier {
-	pub fn new(name: &'static str, version: &'static str) -> Self {
-		ExtensionIdentifier { name, version }
-	}
-}
-
-impl Clone for ExtensionIdentifier {
-	fn clone(&self) -> Self {
-		ExtensionIdentifier {
-			name: self.name,
-			version: self.version,
-		}
-	}
-}
-
-impl Display for ExtensionIdentifier {
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "'{}@{}'", self.name, self.version)
-	}
-}
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct ExtensionDependency {
