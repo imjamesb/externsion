@@ -9,7 +9,7 @@ pub struct InstallError<'a> {
 	pending_dependency:
 		Option<HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>>,
 	description: String,
-	caused_by: Option<Box<dyn Error>>,
+	caused_by: Option<Box<dyn Error + 'a>>,
 	sources: HashMap<&'a ExtensionIdentifier, &'a str>,
 }
 
@@ -23,7 +23,7 @@ impl<'a> InstallError<'a> {
 			HashMap<DependencyName, Vec<(&'a ExtensionIdentifier, &'a ExtensionDependency)>>,
 		>,
 		description: String,
-		caused_by: Option<Box<dyn Error>>,
+		caused_by: Option<Box<dyn Error + 'a>>,
 		sources: Option<HashMap<&'a ExtensionIdentifier, &'a str>>,
 	) -> InstallError<'a> {
 		InstallError {
@@ -48,6 +48,16 @@ impl<'a> InstallError<'a> {
 			pending_dependency: None,
 			description,
 			caused_by: None,
+			sources: HashMap::new(),
+		}
+	}
+	pub fn caused_by(description: String, error: Box<dyn Error + 'a>) -> InstallError<'a> {
+		InstallError {
+			duplicates: None,
+			version_mismatches: None,
+			pending_dependency: None,
+			description,
+			caused_by: Some(error),
 			sources: HashMap::new(),
 		}
 	}

@@ -1,3 +1,5 @@
+#![warn(elided_lifetimes_in_paths)]
+
 mod errors;
 
 use errors::*;
@@ -19,7 +21,7 @@ pub trait Repository<'a, T: BaseExtension + Send + Sync> {
 		&mut self,
 		manifest: &'a ExtensionManifest<T>,
 		source: Option<&'a str>,
-	) -> Result<(), InstallError>;
+	) -> Result<(), InstallError<'a>>;
 	/// Attempts to install an extension directly into extension repository without inserting it
 	/// into the queue. Returns an error if the extension could not be installed, the extension
 	/// otherwise.
@@ -27,20 +29,20 @@ pub trait Repository<'a, T: BaseExtension + Send + Sync> {
 		&mut self,
 		manifest: &'a ExtensionManifest<T>,
 		source: Option<&'a str>,
-	) -> Result<&'a ExtensionIdentifier, InstallError>;
+	) -> Result<&'a ExtensionIdentifier, InstallError<'a>>;
 	/// Flush all extensions in the queue and attempt to activate them into your extension system.
 	/// Returns a vector of those extension's identifiers that could be activated from the queue.
-	fn flush(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError>;
+	fn flush(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError<'a>>;
 	/// Flush all extensions and returns an error if there are missing dependencies or mismatches
 	/// dependency versions. Returns a vector of those extension's identifiers that could be
 	/// activated from the queue.
-	fn install(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError>;
+	fn install(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError<'a>>;
 	/// Set the source path of an extension.
 	fn set_source(
 		&mut self,
 		extension: &'a ExtensionIdentifier,
 		source: &'a str,
-	) -> Result<(), SetSourceError>;
+	) -> Result<(), SetSourceError<'a>>;
 	/// Get the stage of an extension in the repository.
 	fn stage(&mut self, extension: &'a ExtensionIdentifier) -> ExtensionStage;
 	/// Unqueue an extension from being loaded. Returns true if the extension was unloaded, or false if the extension is
@@ -55,13 +57,18 @@ impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionReposito
 		&mut self,
 		manifest: &'a ExtensionManifest<T>,
 		source: Option<&'a str>,
-	) -> Result<(), InstallError> {
+	) -> Result<(), InstallError<'a>> {
 		if self.queued_extensions.contains(&manifest) {
 			Err(InstallError::empty("This extension is already queued".to_string()))
 		} else {
 			self.queued_extensions.push(manifest);
 			if let Some(source) = source {
-				self.set_source(&manifest.identifier, source);
+				if let Err(error) = self.set_source(&manifest.identifier, source) {
+					return Err(InstallError::caused_by(
+						"Failed to set source.".to_string(),
+						Box::new(error),
+					));
+				}
 			}
 			Ok(())
 		}
@@ -71,7 +78,7 @@ impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionReposito
 		&mut self,
 		manifest: &'a ExtensionManifest<T>,
 		source: Option<&'a str>,
-	) -> Result<&'a ExtensionIdentifier, InstallError> {
+	) -> Result<&'a ExtensionIdentifier, InstallError<'a>> {
 		if let Some(source) = source {
 			if !self.queued_extensions.contains(&manifest) {
 				self.queued_extensions.push(manifest);
@@ -81,50 +88,64 @@ impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionReposito
 				.iter()
 				.position(|x| x.identifier == manifest.identifier)
 				.unwrap();
-			self.set_source(&manifest.identifier, source);
+			if let Err(error) = self.set_source(&manifest.identifier, source) {
+				return Err(InstallError::<'a>::caused_by(
+					"Could not set source.".to_string(),
+					Box::new(error),
+				));
+			}
 			self.queued_extensions.remove(index);
 		}
 		manifest.dependencies;
 		todo!();
 	}
 
-	fn flush(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError> {
+	fn flush(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError<'a>> {
 		todo!();
 	}
 
-	fn install(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError> {
+	fn install(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError<'a>> {
 		todo!();
 	}
 	fn set_source(
 		&mut self,
 		extension: &'a ExtensionIdentifier,
 		source: &'a str,
-	) -> Result<(), SetSourceError> {
+	) -> Result<(), SetSourceError<'a>> {
 		let stage = self.stage(extension);
 		match stage {
 			ExtensionStage::Unknown => {
 				Err(SetSourceError::set(extension, source, "Extension is not in repository!"))
 			},
-			ExtensionStage::PendingDependency => Err(SetSourceError::replace(
+			ExtensionStage::PendingDependency => Err(SetSourceError::<'a>::replace(
 				extension,
-				self.get_source(extension),
+				match self.extension_sources.get(extension).unwrap_or_else(|| &None) {
+					Some(value) => Some(value),
+					_ => None,
+				},
 				source,
 				"Extension is being processed and loaded into repository!",
 			)),
 			ExtensionStage::HasDuplicates => Err(SetSourceError::replace(
 				extension,
-				self.get_source(extension),
+				match self.extension_sources.get(extension).unwrap_or_else(|| &None) {
+					Some(value) => Some(value),
+					_ => None,
+				},
 				source,
 				"Extension is being processed and loaded into repository!",
 			)),
 			ExtensionStage::Installed => Err(SetSourceError::replace(
 				extension,
-				self.get_source(extension),
+				match self.extension_sources.get(extension).unwrap_or_else(|| &None) {
+					Some(value) => Some(value),
+					_ => None,
+				},
 				source,
 				"Extension is already installed!",
 			)),
 			ExtensionStage::Queued => {
-				if let Some(src) = self.get_source(extension) {
+				if let Some(Some(src)) = self.extension_sources.get(extension) {
 					Err(SetSourceError::replace(extension, Some(src), source, "Source is already set!"))
 				} else {
 					self.extension_sources.insert(extension, Some(source));
