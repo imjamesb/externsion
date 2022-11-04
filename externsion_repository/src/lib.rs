@@ -20,7 +20,7 @@ pub enum ExtensionStage {
 
 pub trait Repository<'a, T: BaseExtension + Send + Sync> {
 	/// Queue a manifest to be added to the repository. It will only be queued and not touched
-	/// until you you use `<Repository>.install()`
+	/// until you you use `<Repository>.install()` or `<Repository>.flush()`
 	fn queue(
 		&mut self,
 		manifest: &'a ExtensionManifest<T>,
@@ -36,6 +36,7 @@ pub trait Repository<'a, T: BaseExtension + Send + Sync> {
 	) -> Result<&'a ExtensionIdentifier, InstallError<'a>>;
 	/// Flush all extensions in the queue and attempt to activate them into your extension system.
 	/// Returns a vector of those extension's identifiers that could be activated from the queue.
+	/// Errors on duplicates.
 	fn flush(&mut self) -> Result<&'a Vec<&'a ExtensionIdentifier>, InstallError<'a>>;
 	/// Flush all extensions and returns an error if there are missing dependencies or mismatches
 	/// dependency versions. Returns a vector of those extension's identifiers that could be
@@ -92,13 +93,14 @@ impl<'a, T: BaseExtension + Send + Sync> Repository<'a, T> for ExtensionReposito
 				.iter()
 				.position(|x| x.identifier == manifest.identifier)
 				.unwrap();
-			if let Err(error) = self.set_source(&manifest.identifier, source) {
+			let result = self.set_source(&manifest.identifier, source);
+			self.queued_extensions.remove(index);
+			if let Err(error) = result {
 				return Err(InstallError::<'a>::caused_by(
 					"Could not set source.".to_string(),
 					Box::new(error),
 				));
 			}
-			self.queued_extensions.remove(index);
 		}
 		manifest.dependencies;
 		todo!();
