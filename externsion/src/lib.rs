@@ -53,11 +53,8 @@ pub trait BaseExtension {
 	// Fired when all required extensions has been injected..
 	fn ready(&self, _ctx: &mut ExtensionContext) {}
 	/// Fetches a reference to the identifier of *this* extension.
-	fn identifier<'a>(&self, ctx: &mut ExtensionContext<'a>) -> IdentifierContainer {
-		let identifier = ctx.internal_state.borrow::<Arc<ExtensionIdentifier>>();
-		IdentifierContainer {
-			identifier: Arc::clone(&identifier),
-		}
+	fn identifier<'a>(&self, ctx: &mut ExtensionContext<'a>) -> &'a ExtensionIdentifier {
+		&ctx.identifier
 	}
 }
 
