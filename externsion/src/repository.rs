@@ -11,3 +11,6 @@ pub trait Repository<'a, T: BaseExtension + Send + Sync> {
 		source: Option<&'a str>,
 	) -> Result<(), Box<dyn Error + 'a>>;
 }
+
+// todo(imjamesb): Create an error type for Queue errors
+// and replace the error type for `Repository.queue`
