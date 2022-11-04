@@ -1,6 +1,7 @@
 use crate::{
-	ExtensionIdentifier, ExtensionManifest, ExtensionSource, InstallError,
-	QueueError, RepositoryOperation, SetSourceError,
+	ExtensionIdentifier, ExtensionManifest, ExtensionSource,
+	GetSourceError, InstallError, QueueError, RepositoryOperation,
+	SetSourceError,
 };
 use std::error::Error;
 
@@ -70,7 +71,7 @@ pub trait Repository<'a> {
 	fn get_source(
 		&self,
 		identifier: &'a ExtensionIdentifier,
-	) -> Result<Option<ExtensionSource<'a>>, Box<dyn Error + 'a>>;
+	) -> Result<Option<ExtensionSource<'a>>, GetSourceError<'a>>;
 
 	/// Attempt to unload an extension from the repository.
 	/// Returns an error if the extension could not be
@@ -81,9 +82,6 @@ pub trait Repository<'a> {
 		identifier: &'a ExtensionIdentifier,
 	) -> Result<ExtensionManifest, Box<dyn Error + 'a>>;
 }
-
-// todo(imjamesb): Create an error type for get_source and
-// replace the error type for `Repository.get_source`.
 
 // todo(imjamesb): Create an error type for unload and
 // replace the error type for `Repository.unload`.
