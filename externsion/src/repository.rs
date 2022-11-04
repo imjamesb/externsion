@@ -84,3 +84,6 @@ pub trait Repository<'a> {
 
 // todo(imjamesb): Create an error type for get_source and
 // replace the error type for `Repository.get_source`.
+
+// todo(imjamesb): Create an error type for unload and
+// replace the error type for `Repository.unload`.
