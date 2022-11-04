@@ -103,9 +103,12 @@ impl<T: BaseExtension + Send + Sync> PartialEq for ExtensionManifest<T> {
 }
 
 pub struct ExtensionContext<'a> {
+	/// A state that is shared across every loaded extension.
 	pub shared_state: &'a mut State,
+	/// A state that belongs to the extension.
 	pub state: &'a mut State,
-	internal_state: &'a mut State,
+	/// The extension's identifier.
+	identifier: &'a ExtensionIdentifier,
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
