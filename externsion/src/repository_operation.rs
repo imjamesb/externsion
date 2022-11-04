@@ -1,6 +1,6 @@
 use crate::{ExtensionIdentifier, InstallError};
 
 pub struct RepositoryOperation<'a> {
-	installed: Option<Vec<&'a ExtensionIdentifier>>,
-	error: Option<InstallError<'a>>,
+	pub installed: Option<Vec<&'a ExtensionIdentifier>>,
+	pub error: Option<InstallError<'a>>,
 }
