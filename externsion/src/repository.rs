@@ -13,7 +13,7 @@ pub trait Repository<'a> {
 		&mut self,
 		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
-	) -> Result<(), QueueError>;
+	) -> Result<(), QueueError<'a>>;
 
 	/// Attempt to install an extension directly onto the
 	/// repository and skip the queue. Returns an error if
@@ -52,7 +52,7 @@ pub trait Repository<'a> {
 	fn unqueue(
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
-	) -> Result<ExtensionManifest, QueueError>;
+	) -> Result<ExtensionManifest, QueueError<'a>>;
 
 	/// Attempt to set the source for an extension. The
 	/// extension to set the source for must exist within the
