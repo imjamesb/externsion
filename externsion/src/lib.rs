@@ -1,6 +1,6 @@
 mod errors;
 
-use std::{collections::HashMap, fmt::Display, sync::Arc};
+use std::{collections::HashMap, error::Error, fmt::Display, sync::Arc};
 
 pub use errors::InjectionError;
 pub use gotham_state::State;
@@ -54,7 +54,7 @@ pub trait BaseExtension {
 	fn ready(&self, _ctx: &mut ExtensionContext) {}
 	/// Fetches a reference to the identifier of *this* extension.
 	fn identifier<'a>(&self, ctx: &mut ExtensionContext<'a>) -> &'a ExtensionIdentifier {
-		&ctx.identifier
+		&ctx.repository.identifier
 	}
 }
 
@@ -104,8 +104,29 @@ pub struct ExtensionContext<'a> {
 	pub shared_state: &'a mut State,
 	/// A state that belongs to the extension.
 	pub state: &'a mut State,
-	/// The extension's identifier.
+	/// A proxy to the repository.
+	repository: &'a RepositoryProxy<'a>,
+}
+
+impl<'a> ExtensionContext<'a> {}
+
+pub struct RepositoryProxy<'a> {
 	identifier: &'a ExtensionIdentifier,
+}
+
+impl<'a> RepositoryProxy<'a> {
+	/// Get a list of extension identifiers that depend on *this* extension.
+	pub fn get_dependent_identifiers() -> Vec<&'a ExtensionIdentifier> {
+		todo!();
+	}
+
+	/// Get a dependency from the repository. This function returns an error
+	/// if *this* extension does not directly depend on the requested extension.
+	/// Returns None if the extension is not installed on the repository or
+	/// Some(extension) otherwise.
+	pub fn get_dependency<T: BaseExtension + Send + Sync>() -> Result<Option<&'a T>, Box<dyn Error + 'a>> {
+		todo!();
+	}
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
