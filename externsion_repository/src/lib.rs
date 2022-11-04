@@ -1,6 +1,5 @@
 #![warn(elided_lifetimes_in_paths)]
 
-use errors::*;
 use externsion::*;
 
 pub trait Repository<'a, T: BaseExtension + Send + Sync> {
