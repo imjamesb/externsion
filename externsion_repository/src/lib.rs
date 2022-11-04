@@ -1,22 +1,7 @@
 #![warn(elided_lifetimes_in_paths)]
 
-mod errors;
-
 use errors::*;
 use externsion::*;
-
-pub enum ExtensionStage {
-	/// Extension is not known to the repository.
-	Unknown,
-	/// Extension is found in repository install queue.
-	Queued,
-	/// Extension is a duplicate.
-	HasDuplicates,
-	/// The extension is being processed, but is pending a dependency before it can be installed.
-	PendingDependency,
-	/// The extension is installed and active.
-	Installed,
-}
 
 pub trait Repository<'a, T: BaseExtension + Send + Sync> {
 	/// Queue a manifest to be added to the repository. It will only be queued and not touched
