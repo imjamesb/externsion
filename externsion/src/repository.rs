@@ -68,7 +68,13 @@ pub trait Repository<'a> {
 		-> Result<Option<&'a str>, Box<dyn Error + 'a>>;
 
 	/// Attempt to unload an extension from the repository.
-	fn unload(&mut self, identifier: &'a ExtensionIdentifier) -> Result<(), Box<dyn Error + 'a>>;
+	/// Returns an error if the extension could not be
+	/// unloaded or the extension manifest if it was unloaded
+	/// successfully.
+	fn unload(
+		&mut self,
+		identifier: &'a ExtensionIdentifier,
+	) -> Result<ExtensionManifest, Box<dyn Error + 'a>>;
 }
 
 // todo(imjamesb): Create an error type for Queue errors
