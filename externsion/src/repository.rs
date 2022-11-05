@@ -1,7 +1,7 @@
 use crate::{
-	ExtensionIdentifier, ExtensionManifest, ExtensionSource,
-	GetSourceError, InstallError, QueueError, RepositoryOperation,
-	SetSourceError, UnloadError,
+	ExtensionData, ExtensionIdentifier, ExtensionManifest,
+	ExtensionSource, GetSourceError, InstallError, QueueError,
+	RepositoryOperation, SetSourceError, UnloadError,
 };
 
 /// Methods that allow manipulating the inner extension
@@ -13,6 +13,7 @@ pub trait Repository<'a> {
 		&mut self,
 		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
+		data: Option<&'a ExtensionData>,
 	) -> Result<&'a ExtensionIdentifier, QueueError<'a>>;
 
 	/// Attempt to install an extension directly onto the
@@ -23,6 +24,7 @@ pub trait Repository<'a> {
 		&mut self,
 		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
+		data: Option<&'a ExtensionData>,
 	) -> Result<&'a ExtensionIdentifier, InstallError<'a>>;
 
 	/// Flush all extensions in the queue and attempt to

@@ -1,6 +1,7 @@
 mod base_extension;
 mod errors;
 mod extension_context;
+mod extension_data;
 mod extension_dependency;
 mod extension_identifier;
 mod extension_injector;
@@ -14,6 +15,7 @@ mod repository_proxy;
 pub use base_extension::*;
 pub use errors::*;
 pub use extension_context::*;
+pub use extension_data::*;
 pub use extension_dependency::*;
 pub use extension_identifier::*;
 pub use extension_injector::*;

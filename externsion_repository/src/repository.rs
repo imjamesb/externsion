@@ -1,8 +1,8 @@
 use externsion::{
-	ExtensionIdentifier, ExtensionManifest, ExtensionSource,
-	GetSourceError, InnerRepository, InstallError, QueueError,
-	Repository as ExtRepository, RepositoryOperation, SetSourceError,
-	UnloadError,
+	ExtensionData, ExtensionIdentifier, ExtensionManifest,
+	ExtensionSource, GetSourceError, InnerRepository, InstallError,
+	QueueError, Repository as ExtRepository, RepositoryOperation,
+	SetSourceError, UnloadError,
 };
 
 pub struct Repository<'a> {
@@ -22,6 +22,7 @@ impl<'a> ExtRepository<'a> for Repository<'a> {
 		&mut self,
 		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
+		data: Option<&'a ExtensionData>,
 	) -> Result<&'a ExtensionIdentifier, QueueError<'a>> {
 		todo!();
 	}
@@ -37,6 +38,7 @@ impl<'a> ExtRepository<'a> for Repository<'a> {
 		&mut self,
 		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
+		data: Option<&'a ExtensionData>,
 	) -> Result<&'a ExtensionIdentifier, InstallError<'a>> {
 		todo!();
 	}
