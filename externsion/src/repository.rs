@@ -12,7 +12,7 @@ pub trait Repository<'a> {
 		&mut self,
 		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
-		data: Option<&'a ExtensionData>,
+		data: Option<ExtensionData>,
 	) -> Result<&'a ExtensionIdentifier, QueueError<'a>>;
 
 	/// Attempt to install an extension directly onto the
