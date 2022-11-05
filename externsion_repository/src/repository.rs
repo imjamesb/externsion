@@ -60,15 +60,33 @@ impl<'a> ExtRepository<'a> for Repository<'a> {
 	fn unqueue(
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
-	) -> Result<ExtensionManifest, UnqueueError<'a>> {
-		todo!();
+	) -> Result<(&'a ExtensionManifest, Option<ExtensionData>), UnqueueError>
+	{
+		if let Some(index) = self
+			.inner
+			.queued_extensions
+			.iter()
+			.position(|x| x == &identifier)
+		{
+			self.inner.queued_extensions.remove(index);
+			self.inner.sources.remove(identifier);
+			Ok((
+				self.inner.queued_manifests.remove(identifier).unwrap(),
+				self.inner.queued_data.remove(identifier),
+			))
+		} else {
+			Err(UnqueueError::new(format!(
+				"Extension {} is not in the repository queue!",
+				identifier
+			)))
+		}
 	}
 
 	fn push(
 		&mut self,
 		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
-		data: Option<&'a ExtensionData>,
+		data: Option<ExtensionData>,
 	) -> Result<&'a ExtensionIdentifier, InstallError<'a>> {
 		todo!();
 	}
@@ -84,7 +102,10 @@ impl<'a> ExtRepository<'a> for Repository<'a> {
 	fn unload(
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
-	) -> Result<ExtensionManifest, UnloadError<'a>> {
+	) -> Result<
+		(&'a ExtensionManifest, Option<ExtensionData>),
+		UnloadError<'a>,
+	> {
 		todo!();
 	}
 }
