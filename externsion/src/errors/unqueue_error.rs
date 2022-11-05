@@ -1,26 +1,24 @@
 use std::{error::Error, fmt::Display};
 
 #[derive(Debug)]
-pub struct UnqueueError<'a> {
-	description: &'a str,
+pub struct UnqueueError {
+	description: String,
 }
 
-impl<'a> UnqueueError<'a> {
-	pub fn new(description: &'a String) -> UnqueueError<'a> {
-		UnqueueError {
-			description: description.as_str(),
-		}
+impl UnqueueError {
+	pub fn new(description: String) -> UnqueueError {
+		UnqueueError { description }
 	}
 }
 
-impl Display for UnqueueError<'_> {
+impl Display for UnqueueError {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		write!(f, "{}", self.description)
 	}
 }
 
-impl Error for UnqueueError<'_> {
+impl Error for UnqueueError {
 	fn description(&self) -> &str {
-		self.description
+		self.description.as_str()
 	}
 }
