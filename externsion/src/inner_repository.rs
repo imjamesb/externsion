@@ -1,5 +1,6 @@
 use crate::{
-	DependencyName, ExtensionIdentifier, ExtensionManifest, ExtensionName,
+	DependencyName, ExpectedVersion, ExtensionDependency,
+	ExtensionIdentifier, ExtensionManifest, ExtensionName,
 	ExtensionSource, InstalledExtension, State,
 };
 use std::collections::HashMap;
@@ -17,10 +18,12 @@ pub struct InnerRepository<'a> {
 	// extension it should be removed from the
 	// `queue_extensions` property and moved into a seperate
 	// queue for pending extensions.
-	pub pending_extensions:
-		HashMap<DependencyName<'a>, Vec<&'a ExtensionIdentifier>>,
+	pub pending_extensions: HashMap<
+		DependencyName<'a>,
+		Vec<(&'a ExtensionIdentifier, ExpectedVersion<'a>)>,
+	>,
 	pub pending_extensions_r:
-		HashMap<&'a ExtensionIdentifier, Vec<DependencyName<'a>>>,
+		HashMap<&'a ExtensionIdentifier, Vec<&'a ExtensionDependency>>,
 	/// Used to keep track of what extension identifiers has
 	/// been visited.
 	pub maybe_duplicates:
@@ -71,5 +74,72 @@ impl<'a> InnerRepository<'a> {
 			self.queued_data.insert(&manifest.identifier, data);
 		}
 		&manifest.identifier
+	}
+
+	pub fn add_pending(
+		&mut self,
+		identifier: &'a ExtensionIdentifier,
+		dependency: &'a ExtensionDependency,
+	) {
+		if self.queued_extensions.contains(&identifier) {
+			self.queued_extensions.remove(
+				self.queued_extensions
+					.iter()
+					.position(|x| x == &identifier)
+					.unwrap(),
+			);
+		}
+		if let Some(vec) = self.pending_extensions.get_mut(dependency.name)
+		{
+			vec.push((identifier, dependency.expected_version));
+		} else {
+			self.pending_extensions.insert(
+				dependency.name,
+				vec![(identifier, dependency.expected_version)],
+			);
+		}
+		if let Some(vec) = self.pending_extensions_r.get_mut(identifier) {
+			vec.push(dependency);
+		} else {
+			self.pending_extensions_r
+				.insert(identifier, vec![dependency]);
+		}
+	}
+
+	/// Returns `true` if the identifier has no more pending
+	/// dependencies.
+	pub fn remove_pending(
+		&mut self,
+		identifier: &'a ExtensionIdentifier,
+		dependency: &'a ExtensionDependency,
+	) -> bool {
+		let mut remove_ext = false;
+		let mut remove_extr = false;
+		if let Some(vec) = self.pending_extensions.get_mut(dependency.name)
+		{
+			if let Some(index) = vec.iter().position(|x| x.0 == identifier)
+			{
+				vec.remove(index);
+				if vec.len() == 0 {
+					remove_ext = true;
+				}
+			}
+		}
+		if remove_ext {
+			self.pending_extensions.remove(dependency.name);
+		}
+		if let Some(vec) = self.pending_extensions_r.get_mut(identifier) {
+			if let Some(index) = vec.iter().position(|x| x == &dependency)
+			{
+				vec.remove(index);
+				if vec.len() == 0 {
+					remove_extr = true;
+				}
+			}
+		}
+		if remove_extr {
+			self.pending_extensions_r.remove(identifier);
+		}
+		remove_extr
 	}
 }
