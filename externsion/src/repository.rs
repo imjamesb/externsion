@@ -56,24 +56,6 @@ pub trait Repository<'a> {
 		identifier: &'a ExtensionIdentifier,
 	) -> Result<ExtensionManifest, QueueError<'a>>;
 
-	/// Attempt to set the source for an extension. The
-	/// extension to set the source for must exist within the
-	/// queue.
-	fn set_source(
-		&mut self,
-		identifier: &'a ExtensionIdentifier,
-		source: ExtensionSource<'a>,
-	) -> Result<(), SetSourceError<'a>>;
-
-	/// Attempt to get the source of an extension. Returns an
-	/// error if the extension does not exist within the
-	/// repository. Or an option that might contain a str if
-	/// a source has been set for the requested identifier.
-	fn get_source(
-		&self,
-		identifier: &'a ExtensionIdentifier,
-	) -> Result<Option<ExtensionSource<'a>>, GetSourceError<'a>>;
-
 	/// Attempt to unload an extension from the repository.
 	/// Returns an error if the extension could not be
 	/// unloaded or the extension manifest if it was unloaded
