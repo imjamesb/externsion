@@ -23,7 +23,7 @@ pub trait Repository<'a> {
 		&mut self,
 		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
-		data: Option<&'a ExtensionData>,
+		data: Option<ExtensionData>,
 	) -> Result<&'a ExtensionIdentifier, InstallError<'a>>;
 
 	/// Flush all extensions in the queue and attempt to
@@ -54,7 +54,7 @@ pub trait Repository<'a> {
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
 	) -> Result<
-		(&'a ExtensionManifest, Option<&'a ExtensionData>),
+		(&'a ExtensionManifest, Option<ExtensionData>),
 		UnqueueError<'a>,
 	>;
 
@@ -66,7 +66,7 @@ pub trait Repository<'a> {
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
 	) -> Result<
-		(&'a ExtensionManifest, Option<&'a ExtensionData>),
+		(&'a ExtensionManifest, Option<ExtensionData>),
 		UnloadError<'a>,
 	>;
 }
