@@ -22,7 +22,7 @@ impl<'a> ExtRepository<'a> for Repository<'a> {
 		&mut self,
 		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
-	) -> Result<(), QueueError<'a>> {
+	) -> Result<&'a ExtensionIdentifier, QueueError<'a>> {
 		todo!();
 	}
 
