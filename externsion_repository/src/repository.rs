@@ -2,6 +2,7 @@ use externsion::{
 	ExtensionData, ExtensionIdentifier, ExtensionManifest,
 	ExtensionSource, InnerRepository, InstallError, QueueError,
 	Repository as ExtRepository, RepositoryOperation, UnloadError,
+	UnqueueError,
 };
 
 pub struct Repository<'a> {
@@ -59,7 +60,7 @@ impl<'a> ExtRepository<'a> for Repository<'a> {
 	fn unqueue(
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
-	) -> Result<ExtensionManifest, QueueError<'a>> {
+	) -> Result<ExtensionManifest, UnqueueError<'a>> {
 		todo!();
 	}
 
