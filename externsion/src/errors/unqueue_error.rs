@@ -6,8 +6,10 @@ pub struct UnqueueError<'a> {
 }
 
 impl<'a> UnqueueError<'a> {
-	pub fn new(description: &'a str) -> UnqueueError<'a> {
-		UnqueueError { description }
+	pub fn new(description: &'a String) -> UnqueueError<'a> {
+		UnqueueError {
+			description: description.as_str(),
+		}
 	}
 }
 
