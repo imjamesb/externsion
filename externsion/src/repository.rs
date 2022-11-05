@@ -1,6 +1,6 @@
 use crate::{
 	ExtensionData, ExtensionIdentifier, ExtensionManifest, InstallError,
-	QueueError, RepositoryOperation, UnloadError,
+	QueueError, RepositoryOperation, UnloadError, UnqueueError,
 };
 
 /// Methods that allow manipulating the inner extension
@@ -53,7 +53,7 @@ pub trait Repository<'a> {
 	fn unqueue(
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
-	) -> Result<ExtensionManifest, QueueError<'a>>;
+	) -> Result<ExtensionManifest, UnqueueError<'a>>;
 
 	/// Attempt to unload an extension from the repository.
 	/// Returns an error if the extension could not be
