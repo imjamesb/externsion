@@ -13,7 +13,7 @@ pub trait Repository<'a> {
 		&mut self,
 		manifest: &'a ExtensionManifest,
 		source: Option<&'a str>,
-	) -> Result<(), QueueError<'a>>;
+	) -> Result<&'a ExtensionIdentifier, QueueError<'a>>;
 
 	/// Attempt to install an extension directly onto the
 	/// repository and skip the queue. Returns an error if
