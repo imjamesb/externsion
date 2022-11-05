@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::State;
 
 pub struct ExtensionData {
@@ -20,5 +22,11 @@ impl ExtensionData {
 		}
 		(self.unloader)(&mut self.state);
 		self.unloaded = true;
+	}
+}
+
+impl Debug for ExtensionData {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		self.state.fmt(f)
 	}
 }
