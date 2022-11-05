@@ -1,7 +1,6 @@
 use crate::{
-	ExtensionData, ExtensionIdentifier, ExtensionManifest,
-	ExtensionSource, GetSourceError, InstallError, QueueError,
-	RepositoryOperation, SetSourceError, UnloadError,
+	ExtensionData, ExtensionIdentifier, ExtensionManifest, InstallError,
+	QueueError, RepositoryOperation, UnloadError,
 };
 
 /// Methods that allow manipulating the inner extension
