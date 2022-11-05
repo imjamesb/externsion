@@ -1,7 +1,7 @@
 use crate::{
-	DependencyName, ExpectedVersion, ExtensionDependency,
+	DependencyName, ExpectedVersion, ExtensionData, ExtensionDependency,
 	ExtensionIdentifier, ExtensionManifest, ExtensionName,
-	ExtensionSource, InstalledExtension, State,
+	ExtensionSource, InstalledExtension,
 };
 use std::collections::HashMap;
 
@@ -13,7 +13,7 @@ pub struct InnerRepository<'a> {
 	pub queued_extensions: Vec<&'a ExtensionIdentifier>,
 	pub queued_manifests:
 		HashMap<&'a ExtensionIdentifier, &'a ExtensionManifest>,
-	pub queued_data: HashMap<&'a ExtensionIdentifier, State>,
+	pub queued_data: HashMap<&'a ExtensionIdentifier, ExtensionData>,
 	// When a dependency becomes dependent on another
 	// extension it should be removed from the
 	// `queue_extensions` property and moved into a seperate
@@ -33,7 +33,7 @@ pub struct InnerRepository<'a> {
 		HashMap<ExtensionName<'a>, &'a ExtensionIdentifier>,
 	pub installed_extensions:
 		HashMap<ExtensionName<'a>, InstalledExtension<'a>>,
-	pub installed_data: HashMap<&'a ExtensionIdentifier, State>,
+	pub installed_data: HashMap<&'a ExtensionIdentifier, ExtensionData>,
 	pub installed_manifests:
 		HashMap<&'a ExtensionIdentifier, &'a ExtensionManifest>,
 }
@@ -66,7 +66,7 @@ impl<'a> InnerRepository<'a> {
 	pub fn insert_into_queue(
 		&mut self,
 		manifest: &'a ExtensionManifest,
-		data: Option<State>,
+		data: Option<ExtensionData>,
 	) -> &'a ExtensionIdentifier {
 		self.queued_extensions.push(&manifest.identifier);
 		self.queued_manifests.insert(&manifest.identifier, manifest);
