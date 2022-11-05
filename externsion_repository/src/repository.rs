@@ -41,6 +41,7 @@ impl<'a> ExtRepository<'a> for Repository<'a> {
 					},
 				),
 				(&manifest.identifier, source),
+				data,
 			))
 		} else {
 			self.inner.queued_extensions.push(&manifest.identifier);
