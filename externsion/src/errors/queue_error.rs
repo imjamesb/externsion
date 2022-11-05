@@ -1,19 +1,25 @@
 use std::{error::Error, fmt::Display};
 
-use crate::{ExtensionIdentifier, ExtensionSource};
+use crate::{ExtensionData, ExtensionIdentifier, ExtensionSource};
 
 #[derive(Debug)]
 pub struct QueueError<'a> {
 	queued: (&'a ExtensionIdentifier, Option<ExtensionSource<'a>>),
 	attempted: (&'a ExtensionIdentifier, Option<ExtensionSource<'a>>),
+	pub data: Option<ExtensionData>,
 }
 
 impl<'a> QueueError<'a> {
 	pub fn new(
 		queued: (&'a ExtensionIdentifier, Option<ExtensionSource<'a>>),
 		attempted: (&'a ExtensionIdentifier, Option<ExtensionSource<'a>>),
+		data: Option<ExtensionData>,
 	) -> QueueError<'a> {
-		QueueError { queued, attempted }
+		QueueError {
+			queued,
+			attempted,
+			data,
+		}
 	}
 }
 
