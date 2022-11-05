@@ -53,7 +53,10 @@ pub trait Repository<'a> {
 	fn unqueue(
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
-	) -> Result<&'a ExtensionManifest, UnqueueError<'a>>;
+	) -> Result<
+		(&'a ExtensionManifest, Option<&'a ExtensionData>),
+		UnqueueError<'a>,
+	>;
 
 	/// Attempt to unload an extension from the repository.
 	/// Returns an error if the extension could not be
@@ -62,5 +65,8 @@ pub trait Repository<'a> {
 	fn unload(
 		&mut self,
 		identifier: &'a ExtensionIdentifier,
-	) -> Result<ExtensionManifest, UnloadError<'a>>;
+	) -> Result<
+		(&'a ExtensionManifest, Option<&'a ExtensionData>),
+		UnloadError<'a>,
+	>;
 }
