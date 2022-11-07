@@ -63,24 +63,22 @@ impl<'a> ExtRepository<'a> for Repository<'a> {
 		identifier: &'a ExtensionIdentifier,
 	) -> Result<(&'a ExtensionManifest, Option<ExtensionData>), UnqueueError>
 	{
-		if let Some(index) = self
+		let Some(index) = self
 			.inner
 			.queued_extensions
 			.iter()
-			.position(|x| x == &identifier)
-		{
-			self.inner.queued_extensions.remove(index);
-			self.inner.sources.remove(identifier);
-			Ok((
-				self.inner.queued_manifests.remove(identifier).unwrap(),
-				self.inner.queued_data.remove(identifier),
-			))
-		} else {
-			Err(UnqueueError::new(format!(
-				"Extension {} is not in the repository queue!",
-				identifier
-			)))
-		}
+			.position(|x| x == &identifier) else {
+				return Err(UnqueueError::new(format!(
+					"Extension {} is not in the repository queue!",
+					identifier
+				)))
+			};
+		self.inner.queued_extensions.remove(index);
+		self.inner.sources.remove(identifier);
+		Ok((
+			self.inner.queued_manifests.remove(identifier).unwrap(),
+			self.inner.queued_data.remove(identifier),
+		))
 	}
 
 	fn push(
